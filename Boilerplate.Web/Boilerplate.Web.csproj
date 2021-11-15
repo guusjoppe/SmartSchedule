@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+	  <LangVersion>9.0</LangVersion>
+    
+    <Authors>Mark de Bruijn (mark.de.bruijn@infi.nl)</Authors>
+    <Company>Infi</Company>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Hellang.Middleware.ProblemDetails" Version="3.1.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.0.0" />
+	<PackageReference Include="Serilog" Version="2.10.0" />
+	<PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
+	<PackageReference Include="Serilog.Enrichers.Environment" Version="2.1.3" />
+	<PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
+	<PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+	<PackageReference Include="Serilog.Sinks.Elasticsearch" Version="8.0.1" />
+  </ItemGroup>
+  <PropertyGroup>
+<!-- TODO Remove when Serilog.Sinks.Elasticsearch has been updated to a higher stable version 8.1.0-alpha0002-->
+    <NoWarn>NU5104</NoWarn>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Include="build/**" Pack="true" PackagePath="build" />
+    <EmbeddedResource Include="appsettings.Default.json" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Boilerplate.Logging\Boilerplate.Logging.csproj" />
+  </ItemGroup>
+
+</Project>

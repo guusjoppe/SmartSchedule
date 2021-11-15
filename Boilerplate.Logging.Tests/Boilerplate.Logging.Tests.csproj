@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+	  <LangVersion>9.0</LangVersion>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="2.4.1" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\Boilerplate.Logging\Boilerplate.Logging.csproj" />
+  </ItemGroup>
+
+</Project>

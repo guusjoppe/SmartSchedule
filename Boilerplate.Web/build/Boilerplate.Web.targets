@@ -1,0 +1,83 @@
+<Project>
+  <!-- based on https://github.com/dotnet/sdk/blob/94a3f2856cb09e66ee7472820b4e26fb576b4686/src/Tasks/Microsoft.NET.Build.Tasks/build/Microsoft.NET.GenerateAssemblyInfo.targets -->
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <GenerateBoilerplateInfo Condition="'$(GenerateBoilerplateInfo)' == ''">true</GenerateBoilerplateInfo>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GenerateBoilerplateInfo)' == 'true'">
+    <GenerateGitVersionAttribute Condition="'$(GenerateGitVersionAttribute)' == ''">true</GenerateGitVersionAttribute>
+  </PropertyGroup>
+
+  <Target Name="GenerateBoilerplateInfo"
+          BeforeTargets="CoreCompile"
+          DependsOnTargets="PrepareForBuild;RetrieveGitVersion;CoreGenerateBoilerplateInfo"
+          Condition="'$(GenerateBoilerplateInfo)' == 'true'" />
+
+  <Target Name="RetrieveGitVersion"
+          Condition="'$(GitBranch)' == '' and '$(GitCommit)' == ''">
+    <Exec
+            Command="git branch --show-current"
+            ConsoleToMSBuild="true"
+            StandardOutputImportance="low"
+            StandardErrorImportance="low">
+      <Output
+              TaskParameter="ConsoleOutput"
+              PropertyName="GitBranchOutput" />
+      <Output
+              TaskParameter="ExitCode"
+              PropertyName="GitBranchExitCode" />
+    </Exec>
+    <Exec
+            Command="git rev-parse --short HEAD"
+            ConsoleToMSBuild="true"
+            IgnoreExitCode="true"
+            StandardOutputImportance="low"
+            StandardErrorImportance="low">
+      <Output
+              TaskParameter="ConsoleOutput"
+              PropertyName="GitCommitOutput" />
+      <Output
+              TaskParameter="ExitCode"
+              PropertyName="GitCommitExitCode" />
+    </Exec>
+
+    <PropertyGroup>
+      <GitBranch Condition="'$(GitBranchExitCode)' == '0'">$(GitBranchOutput)</GitBranch>
+      <GitCommit Condition="'$(GitCommitExitCode)' == '0'">$(GitCommitOutput)</GitCommit>
+      <GitBranch Condition="'$(GitBranchExitCode)' != '0'">unknown</GitBranch>
+      <GitCommit Condition="'$(GitCommitExitCode)' != '0'">unknown</GitCommit>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="CoreGenerateBoilerplateInfo"
+          Condition="'$(Language)'=='VB' or '$(Language)'=='C#'">
+    <!-- <Target Name="CoreGenerateBoilerplateInfo"
+            Condition="'$(Language)'=='VB' or '$(Language)'=='C#'"
+            Inputs="$(MSBuildAllProjects)"
+            Outputs="$(GeneratedBoilerplateInfoFile)"> -->
+    <PropertyGroup>
+      <GitBranch Condition="'$(GitBranch)' == ''">unknown</GitBranch>
+      <GitCommit Condition="'$(GitCommit)' == ''">unknown</GitCommit>
+    </PropertyGroup>
+    <PropertyGroup>
+      <GeneratedBoilerplateInfoFile Condition="'$(GeneratedBoilerplateInfoFile)' ==''">$(IntermediateOutputPath)$(MSBuildProjectName).BoilerplateInfo$(DefaultLanguageSourceExtension)</GeneratedBoilerplateInfoFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <BoilerAttribute Include="Boilerplate.Logging.GitVersion" Condition="'$(GenerateGitVersionAttribute)' == 'true'">
+        <_Parameter1>$(GitBranch)</_Parameter1>
+        <_Parameter2>$(GitCommit)</_Parameter2>
+      </BoilerAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- Ensure the generated assemblyinfo file is not already part of the Compile sources, as a workaround for https://github.com/dotnet/sdk/issues/114 -->
+      <Compile Remove="$(GeneratedBoilerplateInfoFile)" />
+    </ItemGroup>
+
+    <WriteCodeFragment AssemblyAttributes="@(BoilerAttribute)" Language="$(Language)" OutputFile="$(GeneratedBoilerplateInfoFile)">
+      <Output TaskParameter="OutputFile" ItemName="Compile" />
+      <Output TaskParameter="OutputFile" ItemName="FileWrites" />
+    </WriteCodeFragment>
+  </Target>
+</Project>
